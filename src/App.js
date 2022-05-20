@@ -1,25 +1,62 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from "react";
 import './App.css';
+import CommentItem from "./components/CommentItem";
 
-function App() {
+
+
+
+
+
+export const AppContext = React.createContext(null);
+
+export default function App() {
+
+  const [commentsList, setCommentsList] = useState([]);
+
+  useEffect(() => {
+    let list = localStorage.getItem('commentsList');
+    let list_2;
+    if (list) list_2 = JSON.parse(list);
+    if (list_2 && list_2.length) {
+      setCommentsList(list_2);
+    }
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider
+      value={{
+        commentsList, setCommentsList
+      }}>
+      <div className="App">
+
+        <div className="header">Reviews</div>
+
+        <div className="container">
+          {commentsList && commentsList.length ? commentsList.map((item, index) => {
+            return <CommentItem key={index} item={item} />
+          })
+            :
+            null}
+
+          <CommentItem />
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </AppContext.Provider>
+
   );
 }
 
-export default App;
