@@ -12,6 +12,7 @@ export const AppContext = React.createContext(null);
 export default function App() {
 
   const [commentsList, setCommentsList] = useState([]);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     let list = localStorage.getItem('commentsList');
@@ -26,7 +27,7 @@ export default function App() {
   return (
     <AppContext.Provider
       value={{
-        commentsList, setCommentsList
+        commentsList, setCommentsList, editing, setEditing
       }}>
       <div className="App">
 
