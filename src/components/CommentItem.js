@@ -7,7 +7,7 @@ import imgGen from "@dudadev/random-img";
 
 export default function CommentItem(props) {
 
-    const { commentsList, setCommentsList } = useContext(AppContext);
+    const { commentsList, setCommentsList, editing, setEditing } = useContext(AppContext);
     const { item } = props;
     const [onEdit, setOnEdit] = useState(true);
     const [name, setName] = useState('');
@@ -56,99 +56,104 @@ export default function CommentItem(props) {
                 });
             }
 
-                
-                arr.push(obj);
-                setCommentsList(arr);
-                setName('');
-                setComment('');
-            } else {
-                let editedItem = arr.find(x => x && x.id === item.id);
-                if (editedItem) {
-                    editedItem.name = name;
-                    editedItem.comment = comment;
-                    let sameUser = arr.find(x => x && x.name === name);
-                    if(sameUser){
-                        editedItem.avatar = sameUser.avatar;
-                    }
-                    setCommentsList(arr);
-                    setOnEdit(false);
+
+            arr.push(obj);
+            setCommentsList(arr);
+            setName('');
+            setComment('');
+        } else {
+            let editedItem = arr.find(x => x && x.id === item.id);
+            if (editedItem) {
+                editedItem.name = name;
+                editedItem.comment = comment;
+                let sameUser = arr.find(x => x && x.name === name);
+                if (sameUser) {
+                    editedItem.avatar = sameUser.avatar;
                 }
+                setCommentsList(arr);
+                setOnEdit(false);
             }
-            localStorage.setItem('commentsList', JSON.stringify(arr));
         }
+        localStorage.setItem('commentsList', JSON.stringify(arr));
+        setEditing(false);
+    }
 
-        const deleteItem = () => {
-            let arr = _.cloneDeep(commentsList);
-            let newArr = arr.filter(x => x && x.id !== item.id);
-            setCommentsList(newArr);
-            localStorage.setItem('commentsList', JSON.stringify(newArr));
-
-        }
-
-        return (
-            <div className={styles.itemBlock} onMouseEnter={() => setVisibleButtons(true)} onMouseLeave={() => setVisibleButtons(false)}>
-                {!onEdit ?
-                    <div className={styles.imageBlock}>
-                        <img src={item.avatar} />
-
-                    </div>
-                    : null}
-                <div className={onEdit ? styles.infoBlockBig : styles.infoBlock}>
-                    <div className={styles.nameRow}>
-                        <div>
-                            {onEdit ? <input value={name} type='text' name='name' placeholder="Your Name" onChange={handleChange} />
-                                :
-                                <div className={styles.nameDiv}>
-                                    {name}
-                                </div>}
-
-
-                        </div>
-                        <div className={styles.buttonsGroup}>
-                            {item ?
-                                visibleButtons ?
-                                    <>
-                                        <button className={styles.smallButton} onClick={() => setOnEdit(!onEdit)}>
-                                            E
-                                        </button>
-                                        <button className={styles.smallButton} onClick={deleteItem}>
-                                            X
-                                        </button>
-                                    </>
-                                    :
-                                    null
-                                :
-                                null}
-
-                        </div>
-
-                    </div>
-                    <div className={styles.commentRow}>
-                        {onEdit ?
-                            <textarea value={comment} name='comment' placeholder="Your comment" onChange={handleChange} />
-                            :
-                            <div className={styles.commentDiv}>
-                                {comment}
-                            </div>
-                        }
-
-
-                    </div>
-                    {onEdit ?
-                        <div className="buttonRow">
-                            <button disabled={!name || !comment} onClick={handleSave}>
-                                {item ? 'Save' : 'Add'}
-
-                            </button>
-
-                        </div>
-                        :
-                        null}
-
-                </div>
-
-            </div>
-        );
-
+    const deleteItem = () => {
+        let arr = _.cloneDeep(commentsList);
+        let newArr = arr.filter(x => x && x.id !== item.id);
+        setCommentsList(newArr);
+        localStorage.setItem('commentsList', JSON.stringify(newArr));
 
     }
+
+    return (
+        <div className={styles.itemBlock} onMouseEnter={() => setVisibleButtons(true)} onMouseLeave={() => setVisibleButtons(false)}>
+            {!onEdit ?
+                <div className={styles.imageBlock}>
+                    <img src={item.avatar} />
+
+                </div>
+                : null}
+            <div className={onEdit ? styles.infoBlockBig : styles.infoBlock}>
+                <div className={styles.nameRow}>
+                    <div>
+                        {onEdit ? <input value={name} type='text' name='name' placeholder="Your Name" onChange={handleChange} />
+                            :
+                            <div className={styles.nameDiv}>
+                                {name}
+                            </div>}
+
+
+                    </div>
+                    <div className={styles.buttonsGroup}>
+                        {item ?
+                            visibleButtons ?
+                                <>
+                                    <button className={styles.smallButton} disabled={editing} onClick={() => {
+                                        setOnEdit(!onEdit);
+                                        setEditing(true);
+                                    }
+                                    }>
+                                        E
+                                    </button>
+                                    <button className={styles.smallButton} onClick={deleteItem}>
+                                        X
+                                    </button>
+                                </>
+                                :
+                                null
+                            :
+                            null}
+
+                    </div>
+
+                </div>
+                <div className={styles.commentRow}>
+                    {onEdit ?
+                        <textarea value={comment} name='comment' placeholder="Your comment" onChange={handleChange} />
+                        :
+                        <div className={styles.commentDiv}>
+                            {comment}
+                        </div>
+                    }
+
+
+                </div>
+                {onEdit ?
+                    <div className="buttonRow">
+                        <button disabled={!name || !comment} onClick={handleSave}>
+                            {item ? 'Save' : 'Add'}
+
+                        </button>
+
+                    </div>
+                    :
+                    null}
+
+            </div>
+
+        </div>
+    );
+
+
+}
